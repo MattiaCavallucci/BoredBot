@@ -23,7 +23,7 @@ class Database:
 
     def insert_message(self, author, message, channel):
         self.cursor.execute("INSERT INTO messages (author, message, channel, date) VALUES (?, ?, ?, ?)", 
-                            (author, message, channel, datetime.now().strftime("%Y/%m/%d alle %H:%M:%S")))
+                            (author, message, channel, datetime.now().strftime("%Y/%m/%d %H:%M:%S")))
         self.conn.commit()
         print("Message inserted")
 

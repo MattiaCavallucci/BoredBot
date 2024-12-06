@@ -20,7 +20,7 @@ class Client(discord.Client):
             return
         if message.content == "!read":
             messages = database.get_messages_by_author(message.author.name)
-            messages_parsed = "\n".join([f"{message[2]} - **su {message[3]}** - **il {message[4]}**" for message in messages])
+            messages_parsed = "\n".join([f"{message[2]} - **Su {message[3]}** - **Il {message[4]}**" for message in messages])
             await message.channel.send(f"**Da {message.author.name}** \n{messages_parsed}")
             return
         database.insert_message(message.author.name, message.content, message.channel.name)
