@@ -1,6 +1,5 @@
 import sqlite3
 from datetime import datetime
-import os
 
 class Database:
     def __init__(self) -> None:
