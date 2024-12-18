@@ -1,11 +1,8 @@
 import discord
 from discord.ext import commands
-import discord.ext.commands
 from database import Database
 from dotenv import load_dotenv
 import os
-
-import discord.ext
 
 load_dotenv()
 
@@ -51,21 +48,33 @@ def run():
     @bot.tree.command(name="open_ticket", description="Opens a new ticket")
     async def open_ticket(interaction: discord.Interaction):
         channel = discord.utils.get(interaction.guild.text_channels, name="tickets")
-        await channel.edit(overwrites={interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False)})
+        if not channel:
+            await interaction.response.send_message("No ticket channel found!", ephemeral=True)
+            return
 
         if discord.utils.get(channel.threads, name=f"ticket-{interaction.user.name}"):
             await interaction.response.send_message("You already have an open ticket!", ephemeral=True)
             return
         
+        await channel.edit(overwrites={interaction.user: discord.PermissionOverwrite(read_messages=True)})
         thread = await channel.create_thread(name=f"ticket-{interaction.user.name}", type=discord.ChannelType.private_thread)
         await thread.send(f"Welcome to your ticket, {interaction.user.mention}!")
         await interaction.response.send_message("Ticket opened!", ephemeral=True)
 
-    # @bot.tree.command(name="close_ticket", description="Closes a ticket")
-    # @commands.has_permissions(administrator=True)
-    # async def close_ticket(interaction: discord.Interaction):
-    #     await interaction.response.send_message("Closing ticket...", ephemeral=True)
+    @bot.tree.command(name="close_ticket", description="ADMIN COMMAND - Closes a ticket")
+    @discord.app_commands.default_permissions(administrator=True)
+    async def close_ticket(interaction: discord.Interaction):
+        if not interaction.channel.name.startswith("ticket-"):
+            await interaction.response.send_message("This isn't a ticket!", ephemeral=True)
+            return
+        await interaction.response.send_message("Ticked closed!", ephemeral=True)
+        await interaction.channel.edit(archived=True, locked=True)
 
+    @bot.tree.command(name="delete_all_messages", description="ADMIN COMMAND - Deletes all messages from a channel")
+    @discord.app_commands.default_permissions(administrator=True)
+    async def delete_all_messages(interaction: discord.Interaction):
+        await interaction.response.send_message("Deleting all messages...", ephemeral=True)
+        await interaction.channel.purge()
 
     bot.run(token)
 
